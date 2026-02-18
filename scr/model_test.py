@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import keras
 from keras.layers import Dense
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 from sklearn.metrics import classification_report
 from keras.models import load_model
 
@@ -14,7 +14,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 # 加载数据集
-dataset = pd.read_csv("breast_cancer_data.csv")
+dataset = pd.read_csv("data\\breast_cancer_data.csv")
 # print(dataset)
 
 # 提取数据中的特征
@@ -34,10 +34,11 @@ y_test_one = to_categorical(y_test, 2)
 
 # 将数据特征进行归一化
 sc = MinMaxScaler(feature_range=(0, 1))
-x_test = sc.fit_transform(x_test)
+sc.fit(x_train)
+x_test = sc.transform(x_test)
 
 # 导入训练好的模型
-model = load_model("model.h5")
+model = load_model("output/model.h5")
 
 # 利用训练好的模型进行测试
 predict = model.predict(x_test)
