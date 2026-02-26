@@ -72,3 +72,155 @@ plt.plot(history.history['val_accuracy'], label='val')
 plt.title("全连接神经网络accuracy值图")
 plt.legend()
 plt.show()
+
+
+
+
+
+
+
+
+
+# 在pytorch框架下搭建全连接神经网络模型的代码实现如下：
+# #import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# from sklearn.preprocessing import MinMaxScaler
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import classification_report
+
+# import torch
+# import torch.nn as nn
+# import torch.optim as optim
+# from torch.utils.data import TensorDataset, DataLoader
+
+# # 解决画图里中文显示问题
+# plt.rcParams['font.sans-serif'] = ['SimHei']
+# plt.rcParams['axes.unicode_minus'] = False
+
+# # 加载数据集
+# dataset = pd.read_csv("data\\breast_cancer_data.csv")
+
+# # 提取数据中的特征
+# X = dataset.iloc[:, :-1]
+# # 提取数据集中的标签
+# Y = dataset['target']
+
+# # 划分训练集和测试集
+# x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# # 将数据特征进行归一化
+# sc = MinMaxScaler(feature_range=(0, 1))
+# x_train = sc.fit_transform(x_train)
+# x_test = sc.transform(x_test)
+
+# # 转换为Tensor
+# x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
+# y_train_tensor = torch.tensor(y_train.values, dtype=torch.long)
+# x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
+# y_test_tensor = torch.tensor(y_test.values, dtype=torch.long)
+
+# # 构建DataLoader
+# train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
+# test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
+# train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+# test_loader = DataLoader(test_dataset, batch_size=64)
+
+# # 定义模型
+# class Net(nn.Module):
+#     def __init__(self):
+#         super(Net, self).__init__()
+#         self.fc1 = nn.Linear(x_train.shape[1], 10)
+#         self.fc2 = nn.Linear(10, 10)
+#         self.fc3 = nn.Linear(10, 2)
+#     def forward(self, x):
+#         x = torch.relu(self.fc1(x))
+#         x = torch.relu(self.fc2(x))
+#         x = self.fc3(x)
+#         return x
+
+# model = Net()
+
+# # 损失函数和优化器
+# criterion = nn.CrossEntropyLoss()
+# optimizer = optim.SGD(model.parameters(), lr=0.01)
+
+# # 训练模型
+# num_epochs = 150
+# train_loss_list = []
+# val_loss_list = []
+# train_acc_list = []
+# val_acc_list = []
+
+# for epoch in range(num_epochs):
+#     model.train()
+#     running_loss = 0.0
+#     correct = 0
+#     total = 0
+#     for xb, yb in train_loader:
+#         optimizer.zero_grad()
+#         outputs = model(xb)
+#         loss = criterion(outputs, yb)
+#         loss.backward()
+#         optimizer.step()
+#         running_loss += loss.item() * xb.size(0)
+#         _, predicted = torch.max(outputs, 1)
+#         correct += (predicted == yb).sum().item()
+#         total += yb.size(0)
+#     train_loss = running_loss / total
+#     train_acc = correct / total
+#     train_loss_list.append(train_loss)
+#     train_acc_list.append(train_acc)
+
+#     # 验证集
+#     model.eval()
+#     val_loss = 0.0
+#     val_correct = 0
+#     val_total = 0
+#     with torch.no_grad():
+#         for xb, yb in test_loader:
+#             outputs = model(xb)
+#             loss = criterion(outputs, yb)
+#             val_loss += loss.item() * xb.size(0)
+#             _, predicted = torch.max(outputs, 1)
+#             val_correct += (predicted == yb).sum().item()
+#             val_total += yb.size(0)
+#     val_loss = val_loss / val_total
+#     val_acc = val_correct / val_total
+#     val_loss_list.append(val_loss)
+#     val_acc_list.append(val_acc)
+
+#     if (epoch+1) % 10 == 0 or epoch == 0:
+#         print(f"Epoch [{epoch+1}/{num_epochs}] "
+#               f"Train Loss: {train_loss:.4f} Train Acc: {train_acc:.4f} "
+#               f"Val Loss: {val_loss:.4f} Val Acc: {val_acc:.4f}")
+
+# # 保存模型
+# import os
+# if not os.path.exists('output'):
+#     os.makedirs('output')
+# torch.save(model.state_dict(), 'output/model.pth')
+
+# # 绘制训练集和验证集的loss值对比
+# plt.plot(train_loss_list, label='train')
+# plt.plot(val_loss_list, label='val')
+# plt.title("全连接神经网络loss值图")
+# plt.legend()
+# plt.show()
+
+# # 绘制训练集和验证集的准确率的对比图
+# plt.plot(train_acc_list, label='train')
+# plt.plot(val_acc_list, label='val')
+# plt.title("全连接神经网络accuracy值图")
+# plt.legend()
+# plt.show()
+
+# # 分类报告
+# model.eval()
+# y_pred = []
+# with torch.no_grad():
+#     for xb, _ in test_loader:
+#         outputs = model(xb)
+#         _, predicted = torch.max(outputs, 1)
+#         y_pred.extend(predicted.cpu().numpy())
+# print(classification_report(y_test, y_pred))
